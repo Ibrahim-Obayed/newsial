@@ -89,6 +89,9 @@ jobs:
       - name: সাইট সাজানো
         run: |
           rm -rf _site && cp -r app/site _site
+          # ক্যাশ ভাঙা: style.css ও app.js-এর ?v= প্রতিবার ফাইলের বিষয়বস্তুর হ্যাশ দিয়ে বসে (বদলালেই নতুন নাম, পুরোনো ক্যাশ আটকায় না)
+          for f in style.css app.js; do H=$(sha1sum "_site/$f" | cut -c1-10); sed -i "s#${f}?v=[0-9A-Za-z]*#${f}?v=${H}#g" _site/*.html; done
+          grep -ho '\(style.css\|app.js\)?v=[0-9a-f]*' _site/index.html
           ls -la _site _site/data
 
       - uses: actions/upload-pages-artifact@v3
