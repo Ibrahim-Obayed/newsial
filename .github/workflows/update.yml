@@ -31,7 +31,7 @@ jobs:
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
           printf '%s\n' "$KEY" > ~/.ssh/code_key && chmod 600 ~/.ssh/code_key
           ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
-          GIT_SSH_COMMAND="ssh -i ~/.ssh/code_key -o IdentitiesOnly=yes" git clone --depth 1 git@github.com:Ibrahim-Obayed/khoborpata-code.git app
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/code_key -o IdentitiesOnly=yes" git clone --depth 1 git@github.com:Ibrahim-Obayed/newsial-code.git app
           rm -f ~/.ssh/code_key
 
       - name: আগের ভাণ্ডার ফিরিয়ে আনা (data শাখা)
@@ -68,7 +68,7 @@ jobs:
           if [ "$OUT" = "CHANGED" ]; then
             cd arch
             git init -q -b archive
-            git config user.name "khoborpata-bot"
+            git config user.name "newsial-bot"
             git config user.email "bot@users.noreply.github.com"
             git add -A && git commit -q -m "আর্কাইভ $(date -u +%FT%TZ)"
             git push -q -f "$URL" archive
@@ -81,7 +81,7 @@ jobs:
           rm -rf out && mkdir out && cp app/data/*.json out/
           cd out
           git init -q -b data
-          git config user.name "khoborpata-bot"
+          git config user.name "newsial-bot"
           git config user.email "bot@users.noreply.github.com"
           git add -A && git commit -q -m "ভাণ্ডার $(date -u +%FT%TZ)"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" data
