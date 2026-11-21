@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 15
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url || steps.deploy2.outputs.page_url || steps.deploy3.outputs.page_url }}
     steps:
       - name: কোড আনা (গোপন রিপোজিটরি, শুধু পড়ার চাবি)
         env:
@@ -98,6 +98,28 @@ jobs:
         with:
           path: _site
 
+      # গিটহাবের Pages সার্ভার মাঝে মাঝে সাময়িক সাড়া দেয় না ("Fetching artifact metadata failed")।
+      # তাই ব্যর্থ হলে একটু থেমে আরও দুবার চেষ্টা; তিনবারই ব্যর্থ হলে তবেই রান ব্যর্থ (ও ইমেইল)।
       - name: সাইট প্রকাশ
         id: deploy
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: একটু অপেক্ষা (প্রথম চেষ্টা ব্যর্থ)
+        if: steps.deploy.outcome == 'failure'
+        run: sleep 30
+
+      - name: সাইট প্রকাশ (২য় চেষ্টা)
+        id: deploy2
+        if: steps.deploy.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: একটু অপেক্ষা (২য় চেষ্টাও ব্যর্থ)
+        if: steps.deploy2.outcome == 'failure'
+        run: sleep 60
+
+      - name: সাইট প্রকাশ (৩য় চেষ্টা)
+        id: deploy3
+        if: steps.deploy2.outcome == 'failure'
         uses: actions/deploy-pages@v4
