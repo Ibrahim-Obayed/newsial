@@ -94,6 +94,12 @@ jobs:
           grep -ho '\(style.css\|app.js\)?v=[0-9a-f]*' _site/index.html
           ls -la _site _site/data
 
+      - name: পুরোনো খবরের সার্চ-সূচি (৩০ দিন; ব্যর্থ হলেও সাইট চলবে)
+        continue-on-error: true
+        run: |
+          python3 app/scripts/search_index.py arch app/data/store.json _site/sx || { rm -rf _site/sx.tmp; exit 1; }
+          du -sh _site/sx
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
