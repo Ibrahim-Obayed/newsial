@@ -1,10 +1,8 @@
 name: খবর হালনাগাদ
 
-# চালু হয় বাইরে থেকে: cron-job.org প্রতি ১০ মিনিটে GitHub API-র workflow_dispatch ডাকে (গিটহাবের নিজের cron অনির্ভরযোগ্য)।
-# নিচের schedule বাড়তি ভরসা (চললে ভালো, না চললে ক্ষতি নেই)।
+# চালু হয় বাইরে থেকে: cron-job.org প্রতি ১০ মিনিটে GitHub API-র workflow_dispatch ডাকে।
+# গিটহাবের নিজের schedule ইচ্ছে করে নেই: সেটা অনির্ভরযোগ্য, আর ৬০ দিন নিষ্ক্রিয় রিপোতে গিটহাব schedule-ওয়ালা ওয়ার্কফ্লো বন্ধ করে দেয়।
 on:
-  schedule:
-    - cron: "7,17,27,37,47,57 * * * *"     # প্রতি ১০ মিনিটে; ০/১০/২০ মিনিটে গিটহাবে ভিড় বেশি, তাই বিজোড় মিনিটে
   workflow_dispatch:
 
 permissions:
@@ -100,7 +98,7 @@ jobs:
           python3 app/scripts/search_index.py arch app/data/store.json _site/sx || { rm -rf _site/sx.tmp; exit 1; }
           du -sh _site/sx
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
@@ -109,7 +107,7 @@ jobs:
       - name: সাইট প্রকাশ
         id: deploy
         continue-on-error: true
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - name: একটু অপেক্ষা (প্রথম চেষ্টা ব্যর্থ)
         if: steps.deploy.outcome == 'failure'
@@ -119,7 +117,7 @@ jobs:
         id: deploy2
         if: steps.deploy.outcome == 'failure'
         continue-on-error: true
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - name: একটু অপেক্ষা (২য় চেষ্টাও ব্যর্থ)
         if: steps.deploy2.outcome == 'failure'
@@ -128,4 +126,4 @@ jobs:
       - name: সাইট প্রকাশ (৩য় চেষ্টা)
         id: deploy3
         if: steps.deploy2.outcome == 'failure'
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
